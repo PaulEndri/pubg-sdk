@@ -5,7 +5,7 @@ export default class ApiModel{
         this.api = API;
         this.isRecord = false;
 
-        if(typeof this.get === 'function' && !isNaN(id) && autoload) {
+        if(typeof this.get === 'function' && id && autoload) {
             return this.get(id);
         } 
     }

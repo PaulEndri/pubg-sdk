@@ -1,6 +1,6 @@
 {
   "name": "pubg-sdk-alpha",
-  "version": "0.0.2",
+  "version": "0.0.6",
   "description": "",
   "main": "lib/index.js",
   "scripts": {

@@ -3,7 +3,7 @@ import env   from '../env/env';
 
 const API_ROOT = `https://api.playbattlegrounds.com/shards/${env.region}`;
 const HEADER   = {
-    'Authorization': `Bearer ${env.apiKey}}`,
+    'Authorization': `Bearer ${env.apiKey}`,
     'Content-Type': 'application/json',
     'Accept': 'application/vnd.api+json'
 }

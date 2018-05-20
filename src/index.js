@@ -1,4 +1,4 @@
-import PLayer from './pubg/models/player';
+import Player from './pubg/models/player';
 import Match from './pubg/models/match';
 import API from './api/PubgApi';
 

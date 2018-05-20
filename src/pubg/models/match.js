@@ -1,8 +1,8 @@
 import ApiModel from '../apiModel';
 
 export default class Match extends ApiModel {
-    constructor(id) {
-        super(id);
+    constructor(id, autoload = true) {
+        super(id, autoload);
 
         if(!this.isRecord) {
             this.included = [{

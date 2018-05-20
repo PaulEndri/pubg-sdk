@@ -2,10 +2,10 @@ import ApiModel from '../apiModel';
 import Match from './match';
 
 export default class Player extends ApiModel{
-    constructor(id) {
-        super(id);
+    constructor(id, autoload = true) {
+        super(id, autoload);
 
-        if(this.isRecord === false) {
+        if(this.isRecord === false && !id) {
             this.relationships = {
                 matches: {
                     data: []
@@ -30,7 +30,7 @@ export default class Player extends ApiModel{
         return this.wrapResponse(user);
     }
 
-    async findByName(name) {
+    static async findByName(name) {
         let route = `players?filter[playerName]=${name}`;
         let {data} = await this.api.get(route);
 
