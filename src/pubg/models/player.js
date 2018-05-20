@@ -1,5 +1,6 @@
 import ApiModel from '../apiModel';
 import Match from './match';
+import Api from '../../api/PubgApi'
 
 export default class Player extends ApiModel{
     constructor(id, autoload = true) {
@@ -25,17 +26,17 @@ export default class Player extends ApiModel{
     }
     
     async get(id) {
-        let user = await this.api.get(`players/${id}/`);
+        let {data} = await this.api.get(`players/${id}/`);
 
-        return this.wrapResponse(user);
+        return this.wrapResponse(data);
     }
 
     static async findByName(name) {
         let route = `players?filter[playerName]=${name}`;
-        let {data} = await this.api.get(route);
+        let {data} = await Api.get(route);
 
-        if(data.length > 0) {
-           return this.wrapResponse(data[0]);
+        if(data) {
+            return Object.assign(new Player(false, false), data[0], {isRecord: true});
         }
 
         throw new Error("No results found");

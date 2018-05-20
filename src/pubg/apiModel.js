@@ -7,7 +7,9 @@ export default class ApiModel{
 
         if(typeof this.get === 'function' && id && autoload) {
             return this.get(id);
-        } 
+        } else if (id) {
+            this.id = id
+        }
     }
 
     set id(val) {

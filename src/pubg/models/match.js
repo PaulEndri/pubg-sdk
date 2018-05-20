@@ -46,7 +46,7 @@ export default class Match extends ApiModel {
                     match.id = id;
                 }
         
-                return this.wrapResponse(group);
+                return this.wrapResponse(match);
             });
     }
 

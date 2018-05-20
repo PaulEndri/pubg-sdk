@@ -16,7 +16,7 @@ export default class PubgApi {
                 headers: HEADER,
                 url:     route
             })
-                .then(resolve)
+                .then(({data}) => resolve(data))
                 .catch(e => {
                     console.log(e);
                     reject(e.errors);
