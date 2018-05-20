@@ -1,4 +1,4 @@
-import API from '../api/bungieApi';
+import API from '../api/PubgApi';
 
 export default class ApiModel{
     constructor(id, autoload = true) {

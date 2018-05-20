@@ -1,6 +1,6 @@
 {
-  "name": "bungie-sdk-alpha",
-  "version": "0.0.11",
+  "name": "pubg-sdk-alpha",
+  "version": "0.0.2",
   "description": "",
   "main": "lib/index.js",
   "scripts": {
