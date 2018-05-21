@@ -1,8 +1,17 @@
 import ApiModel from '../apiModel';
 import Match from './match';
 import Api from '../../api/PubgApi';
+import Season from './season';
 
-export default class Player extends ApiModel{
+/**
+ * @class Player
+ */
+export default class Player extends ApiModel {
+    /**
+     * A new player can be called by newing up with an ID or calling a static Player.get(id)
+     * @param {string} id id to search for
+     * @param {bool} autoload if searching for an id, set this to false to not immediately make an api call to popualte the player data
+     */
     constructor(id, autoload = true) {
         super(id, autoload);
 
@@ -31,15 +40,42 @@ export default class Player extends ApiModel{
         return this.wrapResponse(data);
     }
 
+    /**
+     * Fetch a player by id
+     * @param {string} id 
+     */
+    static get(id) {
+        return this.callAPI(`players/${id}`);
+    }
+
+    /**
+     * Load a player's seasonal stats
+     * @param {string} season if left null, defaults to the current season 
+     * @returns {object}
+     */
     async loadSeason(season) {
         if(!season) {
-            const latestSeason = await this.api.get(`seasons`)
+            const latestSeason = await Season.getCurrent();
+
+            return this.internalLoadSeason(latestSeason.id);
         }
+
+        return this.internalLoadSeason(season);
     }
 
     async internalLoadSeason(season) {
+        const {data} = await this.api.get(`players/${this.id}/seasons/${season}`);
 
+        this.relationships.attributes[season] = data.attributes.gameModeStats;
+
+        return data.attributes.gameModeStats;
     }
+
+    /**
+     * Search for a player by name
+     * @param {string} name
+     * @returns {Player} 
+     */
     static async findByName(name) {
         let route = `players?filter[playerName]=${name}`;
         let {data} = await Api.get(route);

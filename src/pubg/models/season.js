@@ -1,8 +1,10 @@
-import ApiModel from '../apiModel';
 import Api from '../../api/PubgApi';
+import ApiModel from '../apiModel';
 
 export default class Season extends ApiModel {
     constructor() {
+        super(false, false)
+
         return Season.get()
     }
 
@@ -10,15 +12,15 @@ export default class Season extends ApiModel {
         return "id";
     }
 
-    static get() {
-        return Api
-            .get(`seasons`)
-            .then(({data}) => data);
+    static async get() {
+        const {data} =  this.callAPI(`seasons`);
+
+        return data;
     }
 
     static getCurrent() {
-        return Api
-            .get('seasons')
-            .then(({data}) => data.filter(d => d.attributes.isCurrentSeason === true)).shift()
+        const data = Season.get();
+
+        return data.filter(d => d.attributes.isCurrentSeason === true).shift() 
     }
 } 

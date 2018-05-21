@@ -1,6 +1,14 @@
 import ApiModel from '../apiModel';
 
+/**
+ * @class Match
+ */
 export default class Match extends ApiModel {
+    /**
+     * A new match can be called by newing up with an ID or calling a static Match.get(id)
+     * @param {string} id id to search for
+     * @param {bool} autoload if searching for an id, set this to false to not immediately make an api call to popualte the match data
+     */
     constructor(id, autoload = true) {
         super(id, autoload);
 
@@ -10,6 +18,7 @@ export default class Match extends ApiModel {
             }];
         }
     }
+
     get route() {
         return "matches";
     }
@@ -34,6 +43,10 @@ export default class Match extends ApiModel {
         }
     }
 
+    /**
+     * Fetch a match by id
+     * @param {*} id 
+     */
     static get(id) {
         return this.callAPI(`${this.route}/${id}/`);
     }
@@ -50,6 +63,10 @@ export default class Match extends ApiModel {
             });
     }
 
+    /**
+     * Fetch for a specific player's data from within a match record
+     * @param {string} name 
+     */
     getPlayerByName(name) {
         if(this.isRecord === false) {
             return {};

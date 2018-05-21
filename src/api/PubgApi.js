@@ -8,7 +8,14 @@ const HEADER   = {
     'Accept': 'application/vnd.api+json'
 }
 
+/**
+ * Simple api connector that wraps around the basic axios object
+ */
 export default class PubgApi {
+    /**
+     * Makes a GET request to the requested route
+     * @param {string} route 
+     */
     static get(route) {
         return new Promise((resolve, reject) => {
             axios({
