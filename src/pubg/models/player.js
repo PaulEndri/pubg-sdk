@@ -1,6 +1,6 @@
 import ApiModel from '../apiModel';
 import Match from './match';
-import Api from '../../api/PubgApi'
+import Api from '../../api/PubgApi';
 
 export default class Player extends ApiModel{
     constructor(id, autoload = true) {
@@ -31,6 +31,15 @@ export default class Player extends ApiModel{
         return this.wrapResponse(data);
     }
 
+    async loadSeason(season) {
+        if(!season) {
+            const latestSeason = await this.api.get(`seasons`)
+        }
+    }
+
+    async internalLoadSeason(season) {
+
+    }
     static async findByName(name) {
         let route = `players?filter[playerName]=${name}`;
         let {data} = await Api.get(route);
