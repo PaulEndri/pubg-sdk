@@ -10,11 +10,15 @@ const HEADER   = {
 
 /**
  * Simple api connector that wraps around the basic axios object
+ * @class PubgApi
  */
-export default class PubgApi {
+class PubgApi {
     /**
      * Makes a GET request to the requested route
-     * @param {string} route 
+     * @param {string} route
+     * @fulfil {object} PUBG Api Data
+     * @error {object} Axios error object
+     * @return {Promise}
      */
     static get(route) {
         return new Promise((resolve, reject) => {
@@ -32,3 +36,5 @@ export default class PubgApi {
     }
 
 }
+
+module.exports = PubgApi

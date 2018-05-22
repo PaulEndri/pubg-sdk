@@ -5,10 +5,12 @@ import Season from './season';
 
 /**
  * @class Player
+ * @extends ApiModel
  */
-export default class Player extends ApiModel {
+class Player extends ApiModel {
     /**
      * A new player can be called by newing up with an ID or calling a static Player.get(id)
+     *
      * @param {string} id id to search for
      * @param {bool} autoload if searching for an id, set this to false to not immediately make an api call to popualte the player data
      */
@@ -28,12 +30,22 @@ export default class Player extends ApiModel {
        return "id";
     }
 
+    /**
+     * @type {Match[]}
+     */
     get matches() {
         return this.isRecord === true
             ? this.relationships.matches.data.map(match => new Match(match.id, false))
             : [];
     }
     
+    /**
+     * Returns a fetched Player response
+     *
+     * @param {string} id 
+     * @return {Promise}
+     * @fulfill {Player}
+     */
     async get(id) {
         let {data} = await this.api.get(`players/${id}/`);
 
@@ -42,7 +54,10 @@ export default class Player extends ApiModel {
 
     /**
      * Fetch a player by id
+     *
      * @param {string} id 
+     * @fulfil {Player}
+     * @returns {Promise}
      */
     static get(id) {
         return this.callAPI(`players/${id}`);
@@ -50,8 +65,10 @@ export default class Player extends ApiModel {
 
     /**
      * Load a player's seasonal stats
+     *
      * @param {string} season if left null, defaults to the current season 
-     * @returns {object}
+     * @fulfil {object}
+     * @returns {Promise}
      */
     async loadSeason(season) {
         if(!season) {
@@ -63,6 +80,11 @@ export default class Player extends ApiModel {
         return this.internalLoadSeason(season);
     }
 
+    /**
+     * @private
+     * @param {string} season
+     * @returns {Promise}
+     */
     async internalLoadSeason(season) {
         const {data} = await this.api.get(`players/${this.id}/seasons/${season}`);
 
@@ -73,8 +95,10 @@ export default class Player extends ApiModel {
 
     /**
      * Search for a player by name
+     *
      * @param {string} name
-     * @returns {Player} 
+     * @fulfil {Player}
+     * @returns {Promise}
      */
     static async findByName(name) {
         let route = `players?filter[playerName]=${name}`;
@@ -87,3 +111,5 @@ export default class Player extends ApiModel {
         throw new Error("No results found");
     }
 }
+
+module.exports = Player

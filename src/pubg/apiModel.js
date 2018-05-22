@@ -12,6 +12,12 @@ export default class ApiModel{
         }
     }
 
+    /**
+     * Set the local primary key
+     * @private
+     *
+     * @param {*} val
+     */
     set id(val) {
         if(this.primaryKey == 'id') {
             return this._id = val;
@@ -19,6 +25,9 @@ export default class ApiModel{
         return this[this.primaryKey] = val;
     }
 
+    /**
+     * @type {string}
+     */
     get id() {
         if(this.primaryKey == 'id') {
             return this._id;

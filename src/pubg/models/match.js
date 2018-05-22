@@ -1,11 +1,13 @@
 import ApiModel from '../apiModel';
-
+import axios from 'axios'
 /**
  * @class Match
+ * @extends ApiModel
  */
-export default class Match extends ApiModel {
+class Match extends ApiModel {
     /**
      * A new match can be called by newing up with an ID or calling a static Match.get(id)
+     * @constructs
      * @param {string} id id to search for
      * @param {bool} autoload if searching for an id, set this to false to not immediately make an api call to popualte the match data
      */
@@ -19,14 +21,16 @@ export default class Match extends ApiModel {
         }
     }
 
-    get route() {
-        return "matches";
+    /**
+     * @type object
+     */
+    get relationships() {
+        return this.data.relationshps
     }
 
-    get primaryKey() {
-        return "id";
-    }
-
+    /**
+     * @type {string}
+     */
     get type() {
         try {
             return this.data.attributes.gameMode;
@@ -35,6 +39,9 @@ export default class Match extends ApiModel {
         }
     }
 
+    /**
+     * @type {string}
+     */
     get map() {
         try {
             return this.data.attributes.mapname;
@@ -45,12 +52,22 @@ export default class Match extends ApiModel {
 
     /**
      * Fetch a match by id
+     *
+     * @memberOf {Match}
      * @param {*} id 
+     * @return {Promise}
+     * @fulfill {Match}
      */
     static get(id) {
         return this.callAPI(`${this.route}/${id}/`);
     }
 
+    /**
+     * Fetch for a specific match
+     * WARNING: This will overwrite this object's internal data
+     * @param {string} id
+     * @return {Match} 
+     */
     get(id) {
         return this.api
             .get(`${this.route}/${id}/`)
@@ -65,7 +82,9 @@ export default class Match extends ApiModel {
 
     /**
      * Fetch for a specific player's data from within a match record
-     * @param {string} name 
+     *
+     * @param {string} name
+     * @return {object}
      */
     getPlayerByName(name) {
         if(this.isRecord === false) {
@@ -74,4 +93,30 @@ export default class Match extends ApiModel {
 
         return this.included.find(i => i.attributes.name === name);
     }
-} 
+
+    /**
+     * Return a match's telemetry data
+     *
+     * @param {bool} full set to true to make the call, otherwise return the URL
+     * @fulfil {URL}
+     * @returns promise
+     */
+    async getTelemetry(full = false) {
+        try {
+            const id = this.data.relationships.assets.data.id
+            const asset = this.included.find(i => i.id === id)
+
+           if(full) {
+               const {data} = axios.get(asset.attributes.URL)
+
+               return data;
+           }
+
+           return asset.attributes.URL
+        } catch(e) {
+            return full ? {} : '';
+        }
+    }
+}
+
+module.exports = Match
