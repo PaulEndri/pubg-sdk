@@ -1,10 +1,10 @@
 {
   "name": "apubg-sdk",
-  "version": "0.0.15",
+  "version": "0.1.0",
   "description": "Advanced PUBG SDK",
   "main": "lib/index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "mocha tests",
     "start": "babel-node src/index.js",
     "build": "babel src --out-dir lib"
   },
@@ -19,6 +19,8 @@
     "babel-core": "^6.26.0",
     "babel-preset-env": "^1.6.1",
     "babel-preset-es2015": "^6.24.1",
-    "babel-preset-typescript": "^7.0.0-alpha.19"
+    "babel-preset-typescript": "^7.0.0-alpha.19",
+    "chai": "^4.1.2",
+    "mocha": "^5.2.0"
   }
 }

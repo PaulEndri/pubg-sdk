@@ -4,7 +4,7 @@ import axios from 'axios'
  * @class Match
  * @extends ApiModel
  */
-class Match extends ApiModel {
+export default class Match extends ApiModel {
     /**
      * A new match can be called by newing up with an ID or calling a static Match.get(id)
      * @constructs
@@ -59,7 +59,7 @@ class Match extends ApiModel {
      * @fulfill {Match}
      */
     static get(id) {
-        return this.callAPI(`${this.route}/${id}/`);
+        return new Match(id);
     }
 
     /**
@@ -118,5 +118,3 @@ class Match extends ApiModel {
         }
     }
 }
-
-module.exports = Match

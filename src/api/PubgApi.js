@@ -12,7 +12,7 @@ const HEADER   = {
  * Simple api connector that wraps around the basic axios object
  * @class PubgApi
  */
-class PubgApi {
+export default class PubgApi {
     /**
      * Makes a GET request to the requested route
      * @param {string} route
@@ -36,5 +36,3 @@ class PubgApi {
     }
 
 }
-
-module.exports = PubgApi

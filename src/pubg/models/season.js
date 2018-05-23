@@ -6,7 +6,7 @@ import { Module } from 'module';
  * @class Season
  * @extends ApiModel
  */
-class Season extends ApiModel {
+export default class Season extends ApiModel {
     constructor() {
         super(false, false)
 
@@ -23,7 +23,7 @@ class Season extends ApiModel {
      * @fulfil {Season[]}
      */
     static async get() {
-        const {data} =  this.callAPI(`seasons`);
+        const {data} =  await this.callAPI(`seasons`);
 
         return data;
     }
@@ -35,11 +35,9 @@ class Season extends ApiModel {
      * @returns {Promise}
      * @fulfill {Season}
      */
-    static getCurrent() {
-        const data = Season.get();
+    static async getCurrent() {
+        const data = await Season.get();
 
         return data.filter(d => d.attributes.isCurrentSeason === true).shift() 
     }
 }
-
-module.exports = Player

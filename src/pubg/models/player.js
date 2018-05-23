@@ -7,7 +7,7 @@ import Season from './season';
  * @class Player
  * @extends ApiModel
  */
-class Player extends ApiModel {
+export default class Player extends ApiModel {
     /**
      * A new player can be called by newing up with an ID or calling a static Player.get(id)
      *
@@ -47,7 +47,7 @@ class Player extends ApiModel {
      * @fulfill {Player}
      */
     async get(id) {
-        let {data} = await this.api.get(`players/${id}/`);
+        let {data} = await this.api.get(`players/${id}`);
 
         return this.wrapResponse(data);
     }
@@ -59,8 +59,8 @@ class Player extends ApiModel {
      * @fulfil {Player}
      * @returns {Promise}
      */
-    static get(id) {
-        return this.callAPI(`players/${id}`);
+    static async get(id) {
+        return await new Player(id);
     }
 
     /**
@@ -111,5 +111,3 @@ class Player extends ApiModel {
         throw new Error("No results found");
     }
 }
-
-module.exports = Player
