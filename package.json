@@ -1,7 +1,7 @@
 {
-  "name": "pubg-sdk-alpha",
+  "name": "apubg-sdk",
   "version": "0.0.15",
-  "description": "",
+  "description": "Advanced PUBG SDK",
   "main": "lib/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
