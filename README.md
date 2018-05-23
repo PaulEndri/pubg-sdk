@@ -54,4 +54,4 @@ Player.get('account.d50fdc18fcad49c691d38466bed6f8fd')
     })
 ```
 
-### [AdditionalDocs]('DOCUMENTATION.md')
+### [AdditionalDocs]('/DOCUMENTATION.md')
