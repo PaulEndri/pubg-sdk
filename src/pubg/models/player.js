@@ -88,7 +88,7 @@ export default class Player extends ApiModel {
     async internalLoadSeason(season) {
         const {data} = await this.api.get(`players/${this.id}/seasons/${season}`);
 
-        this.relationships.attributes[season] = data.attributes.gameModeStats;
+        this.relationships[season] = data.attributes.gameModeStats;
 
         return data.attributes.gameModeStats;
     }

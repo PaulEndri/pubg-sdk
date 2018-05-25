@@ -25,7 +25,7 @@ export default class Match extends ApiModel {
      * @type object
      */
     get relationships() {
-        return this.data.relationshps
+        return this.data.relationships;
     }
 
     /**
@@ -48,6 +48,20 @@ export default class Match extends ApiModel {
         } catch(e) {
             return null;
         }
+    }
+
+    /**
+     * @type {[]}
+     */
+    get players() {
+        return this.getPlayers(true)
+    }
+
+    /**
+     * @type {[]}
+     */
+    get rosters() {
+        return this.getRosters(true)
     }
 
     /**
@@ -91,7 +105,59 @@ export default class Match extends ApiModel {
             return {};
         }
 
-        return this.included.find(i => i.attributes.name === name);
+        return this.included.find(i => i.attributes.stats.name === name);
+    }
+
+    /**
+     * Fetch for a specific player's data from within a match record
+     * @private
+     * @param {string} id
+     * @return {object}
+     */
+    getPlayerById(id) {
+        if(this.isRecord === false) {
+            return {};
+        }
+
+        return this.included.find(i => i.id === id);
+    }
+
+    /**
+     * Return a list of rosters
+     * @param {Boolean} full if set to true, will parse the data and return each roster with the player data
+     * @returns {Roster[]} 
+     */
+    getRosters(full = false) {
+        if(this.isRecord === false) {
+            return [];
+        }
+
+        const rosters = this.included.filter(i => i.type === "roster");
+
+        if(!full) {
+            return rosters;
+        }
+
+        return rosters.map(r => {
+            const roster = {
+                rank: r.attributes.stats,
+                players: r.relationships.participants.data.map(d => {
+                    const player = this.getPlayerById(d.id);
+
+                    return player.attributes.stats;
+                })
+            }
+        })
+    }
+
+    getPlayers(simplified = true) {
+        const players = this.included.filter(i => i.type === "participant");
+
+        if(simplified) {
+            return players.map(p => p.attributes.stats)
+        }
+
+        return players
     }
 
     /**
@@ -107,12 +173,12 @@ export default class Match extends ApiModel {
             const asset = this.included.find(i => i.id === id)
 
            if(full) {
-               const {data} = axios.get(asset.attributes.URL)
+               const {data} = axios.get(asset.attributes.URL);
 
                return data;
            }
 
-           return asset.attributes.URL
+           return asset.attributes.URL;
         } catch(e) {
             return full ? {} : '';
         }
