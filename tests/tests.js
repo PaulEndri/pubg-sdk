@@ -2,7 +2,7 @@ const expect = require('chai').expect;
 const SDK = require('../lib')
 const telemetry = require('./telemetry.json')
 const shroud = 'account.d50fdc18fcad49c691d38466bed6f8fd'
-/*
+
 describe('Player', () => {
     it('Pull Shroud\'s profile via constructor', async () => {
         const Shroud = await new SDK.Player(shroud)
@@ -30,7 +30,7 @@ describe('Season', () => {
         expect(currentSeason).to.not.be.null
     })
 })
-*/
+
 
 describe('Telemetry', () => {
     it('Parses', async () => {
@@ -38,8 +38,6 @@ describe('Telemetry', () => {
 
         const data = await parser.parse()
 
-        console.log(data);
-        console.log(data.getLeaderboard());
         expect(data).to.not.be.null
     })
 })

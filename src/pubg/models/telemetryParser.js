@@ -38,7 +38,7 @@ export default class TelemetryParser {
     }
 
     getPlayerWeaponRecord(player, weapon) {
-        const record = this.players[player][weapon];
+        const record = this.players[player].weapons[weapon];
 
         if(record !== undefined) {
             return record;
@@ -48,15 +48,17 @@ export default class TelemetryParser {
     }
 
     createPlayerWeaponRecord(player, weapon) {
-        this.players[player][weapon] = {
-            usage: 0,
-            kills: 0,
-            damage: 0,
-            hit: 0,
-            distance: 0
+        this.players[player].weapons = {
+            [weapon]: {
+                usage: 0,
+                kills: 0,
+                damage: 0,
+                hit: 0,
+                distance: 0
+            }
         };
 
-        return this.players[player][weapon];
+        return this.players[player].weapons[weapon];
     }
 
     parseLogin({character}) {
