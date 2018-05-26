@@ -76,6 +76,10 @@ export default class Match extends ApiModel {
         return new Match(id);
     }
 
+    get route() {
+        return "matches";
+    }
+
     /**
      * Fetch for a specific match
      * WARNING: This will overwrite this object's internal data
@@ -84,7 +88,7 @@ export default class Match extends ApiModel {
      */
     get(id) {
         return this.api
-            .get(`${this.route}/${id}/`)
+            .get(`${this.route}/${id}`)
             .then(match => {
                 if(match) {
                     match.id = id;
@@ -169,11 +173,11 @@ export default class Match extends ApiModel {
      */
     async getTelemetry(full = false) {
         try {
-            const id = this.data.relationships.assets.data.id
+            const id = this.data.relationships.assets.data[0].id
             const asset = this.included.find(i => i.id === id)
 
            if(full) {
-               const {data} = axios.get(asset.attributes.URL);
+               const {data} = await axios.get(asset.attributes.URL);
 
                return data;
            }

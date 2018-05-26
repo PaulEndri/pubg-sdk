@@ -50,6 +50,7 @@ export default class TelemetryParser {
     createPlayerWeaponRecord(player, weapon) {
         this.players[player].weapons = {
             [weapon]: {
+                name: weapon,
                 usage: 0,
                 kills: 0,
                 damage: 0,
@@ -72,7 +73,7 @@ export default class TelemetryParser {
             this.rosters[character.teamId].roster[character.accountId] = character;
         }
 
-        this.players[character.accountId] = character;
+        this.players[character.accountId] = {...character, weapons: {}};
     }
 
     parseAttack({attacker, attackId, attackType, weapon, vehicle}) {
@@ -82,7 +83,7 @@ export default class TelemetryParser {
         
         const record = this.getPlayerWeaponRecord(attacker.accountId, Items[weapon.itemId]);
 
-        record.usage++;
+        record.usage = record.usage + 1;
     }
 
     parseDamage({victim, attacker, attackId, damageReason, damageTypeCategory, damage, damageCauserName}) {
@@ -110,7 +111,7 @@ export default class TelemetryParser {
         let record = this.getPlayerWeaponRecord(killer.accountId, DamageCauserName[damageCauserName]);
 
         this.players[killer.accountId].kills = (this.players[killer.accountId].kills || 0) + 1;
-        record.kills = record.kills++;
+        record.kills = record.kills + 1;
         record.distance = Math.max(distance, record.distance)
     }
 
