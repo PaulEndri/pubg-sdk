@@ -23,7 +23,7 @@ export default class Season extends ApiModel {
      * @fulfil {Season[]}
      */
     static async get() {
-        const {data} =  await this.callAPI(`seasons`);
+        const {data} =  await this.callAPI(`seasons`, 'pc-na');
 
         return data;
     }

@@ -35,7 +35,7 @@ export default class Player extends ApiModel {
      */
     get matches() {
         return this.isRecord === true
-            ? this.relationships.matches.data.map(match => new Match(match.id, false))
+            ? this.relationships.matches.data.map(match => new Match(match.id, this.region, false))
             : [];
     }
     
@@ -43,11 +43,12 @@ export default class Player extends ApiModel {
      * Returns a fetched Player response
      *
      * @param {string} id 
+     * @param {region} region
      * @return {Promise}
      * @fulfill {Player}
      */
-    async get(id) {
-        let {data} = await this.api.get(`players/${id}`);
+    async get(id, region) {
+        let {data} = await this.api.get(`players/${id}`, region);
 
         return this.wrapResponse(data);
     }
@@ -56,11 +57,12 @@ export default class Player extends ApiModel {
      * Fetch a player by id
      *
      * @param {string} id 
+     * @param {string} region
      * @fulfil {Player}
      * @returns {Promise}
      */
-    static async get(id) {
-        return await new Player(id);
+    static async get(id, region) {
+        return await new Player(id, region);
     }
 
     /**
@@ -83,10 +85,11 @@ export default class Player extends ApiModel {
     /**
      * @private
      * @param {string} season
+     * @param {string} region
      * @returns {Promise}
      */
-    async internalLoadSeason(season) {
-        const {data} = await this.api.get(`players/${this.id}/seasons/${season}`);
+    async internalLoadSeason(season, region) {
+        const {data} = await this.api.get(`players/${this.id}/seasons/${season}`, region);
 
         this.relationships[season] = data.attributes.gameModeStats;
 
@@ -97,15 +100,16 @@ export default class Player extends ApiModel {
      * Search for a player by name
      *
      * @param {string} name
+     * @param {string} region
      * @fulfil {Player}
      * @returns {Promise}
      */
-    static async findByName(name) {
+    static async findByName(name, region) {
         let route = `players?filter[playerName]=${name}`;
-        let {data} = await Api.get(route);
+        let {data} = await Api.get(route, region);
 
         if(data) {
-            return Object.assign(new Player(false, false), data[0], {isRecord: true});
+            return Object.assign(new Player(false, region, false), data[0], {isRecord: true});
         }
 
         throw new Error("No results found");

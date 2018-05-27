@@ -1,12 +1,14 @@
 import API from '../api/PubgApi';
+import env from '../env/env';
 
 export default class ApiModel{
-    constructor(id, autoload = true) {
+    constructor(id, region, autoload = true) {
         this.api = API;
         this.isRecord = false;
+        this.region = region || env.region;
 
         if(typeof this.get === 'function' && id && autoload) {
-            return this.get(id);
+            return this.get(id, this.region);
         } else if (id) {
             this.id = id
         }
@@ -36,8 +38,8 @@ export default class ApiModel{
         return this[this.primaryKey];
     }
 
-    static callAPI(route) {
-        return API.get(route);
+    static callAPI(route, region) {
+        return API.get(route, region);
     }
 
     clean() {
@@ -56,38 +58,8 @@ export default class ApiModel{
 
     load() {
         if(this.isRecord === false) {
-            return this.get(this.id);
+            return this.get(this.id, this.region);
         }
-    }
-
-    processId(id) {
-        if(!id && this.isRecord === true && this.primaryKey !== false) {
-            return this.id;
-        } else if(this.primaryKey === false && !id && this.record === true) {
-            throw Error("Please specify a primary key on a custom api model if it is to act as a proxy.");
-        }
-
-        return id;
-    }
-
-    recordCall(route, key, id, sub = false) {
-        let callId  = this.processId(id);
-        
-        return this.api
-            .get(route.replace("{id}", callId))
-            .then(results => {
-                if(this.isRecord === true) {
-                    if(sub !== false) {
-                        results = results[sub];
-                    }
-        
-                    this[key] = results;
-                
-                    return this;
-                }
-        
-                return results;
-            });
     }
 
     wrapResponse(obj) {

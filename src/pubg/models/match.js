@@ -9,16 +9,21 @@ export default class Match extends ApiModel {
      * A new match can be called by newing up with an ID or calling a static Match.get(id)
      * @constructs
      * @param {string} id id to search for
+     * @param {string} region
      * @param {bool} autoload if searching for an id, set this to false to not immediately make an api call to popualte the match data
      */
-    constructor(id, autoload = true) {
-        super(id, autoload);
+    constructor(id, region, autoload = true) {
+        super(id, region, autoload);
 
         if(!this.isRecord) {
             this.included = [{
                 attributes: {}
             }];
         }
+    }
+
+    get primaryKey() {
+        return "id";
     }
 
     /**
@@ -68,12 +73,13 @@ export default class Match extends ApiModel {
      * Fetch a match by id
      *
      * @memberOf {Match}
-     * @param {*} id 
+     * @param {string} id
+     * @param {string} region
      * @return {Promise}
      * @fulfill {Match}
      */
-    static get(id) {
-        return new Match(id);
+    static get(id, region) {
+        return new Match(id, region);
     }
 
     get route() {
@@ -84,18 +90,14 @@ export default class Match extends ApiModel {
      * Fetch for a specific match
      * WARNING: This will overwrite this object's internal data
      * @param {string} id
+     * @param {string} region
      * @return {Match} 
      */
-    get(id) {
-        return this.api
-            .get(`${this.route}/${id}`)
-            .then(match => {
-                if(match) {
-                    match.id = id;
-                }
-        
-                return this.wrapResponse(match);
-            });
+    async get(id, region) {
+        let data = await this.api.get(`${this.route}/${id}`, region);
+        data.id  = id;
+
+        return this.wrapResponse(data);
     }
 
     /**
