@@ -1,4 +1,5 @@
 export default {
+  "": "Player",
   "Item_Ammo_12Guage_C": "12 Gauge Ammo",
   "Item_Ammo_300Magnum_C": "300 Magnum Ammo",
   "Item_Ammo_45ACP_C": ".45 ACP Ammo",
@@ -75,6 +76,7 @@ export default {
   "Item_Weapon_Crossbow_C": "Crossbow",
   "Item_Weapon_DP28_C": "DP-28",
   "Item_Weapon_FlashBang_C": "Flashbang",
+  "Item_Weapon_FNFal_C": "SLR",
   "Item_Weapon_G18_C": "P18C",
   "Item_Weapon_Grenade_C": "Frag Grenade",
   "Item_Weapon_Groza_C": "Groza",

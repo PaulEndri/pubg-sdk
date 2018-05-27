@@ -18,6 +18,7 @@ export default class TelemetryParser {
     constructor(data) {
         this.players = {};
         this.rosters = {};
+        this.attacks = {};
 
         if(typeof data === 'string') {
             axios
@@ -48,14 +49,22 @@ export default class TelemetryParser {
     }
 
     createPlayerWeaponRecord(player, weapon) {
-        this.players[player].weapons = {
-            [weapon]: {
-                name: weapon,
-                usage: 0,
-                kills: 0,
-                damage: 0,
-                hit: 0,
-                distance: 0
+        if(!this.players[player].weapons) {
+            this.players[player.weapons]
+        }
+        this.players[player].weapons[weapon] = {
+            name:      weapon,
+            usage:     0,
+            kills:     0,
+            damage:    0,
+            hit:       0,
+            distance:  0,
+            locations: {
+                ArmShot:    0,
+                TorsoShot:  0,
+                HeadShot:   0,
+                PelvisShot: 0,
+                LegShot:    0
             }
         };
 
@@ -73,7 +82,8 @@ export default class TelemetryParser {
             this.rosters[character.teamId].roster[character.accountId] = character;
         }
 
-        this.players[character.accountId] = {...character, weapons: {}};
+        this.players[character.accountId]         = character
+        this.players[character.accountId].weapons = {}
     }
 
     parseAttack({attacker, attackId, attackType, weapon, vehicle}) {
@@ -84,20 +94,24 @@ export default class TelemetryParser {
         const record = this.getPlayerWeaponRecord(attacker.accountId, Items[weapon.itemId]);
 
         record.usage = record.usage + 1;
+        this.attacks[attackId] = {attacker, attackType, weapon, vehicle}
     }
 
     parseDamage({victim, attacker, attackId, damageReason, damageTypeCategory, damage, damageCauserName}) {
-        if(attackId === -1 || damageTypeCategory !== "Damage_Gun" || isNullOrUndefined(attacker)) {
+        if(attackId === -1 || isNullOrUndefined(attacker)) {
             return;
         }
 
-        let record = this.getPlayerWeaponRecord(attacker.accountId, DamageCauserName[damageCauserName]);
+        let record    = this.getPlayerWeaponRecord(attacker.accountId, DamageCauserName[damageCauserName]);
+        record.hit    = record.hit + 1;
+        record.damage = record.damage += damage;
 
-        record.hit = record.hit++;
-        record.damage = record.damage+=damage;
+        if(!isNullOrUndefined(record.locations[damageReason])) {
+            record.locations[damageReason] = record.locations[damageReason] + 1;
+        }
     }
 
-    parseKill({killer, victim, damageCauserName, distance}) {
+    parseKill({attackId, killer, victim, damageCauserName, damageTypeCategory, distance}) {
         if(victim.ranking !== 0) {
             this.rosters[victim.teamId].ranking = victim.ranking;
         }
@@ -108,7 +122,16 @@ export default class TelemetryParser {
             return;
         }
 
-        let record = this.getPlayerWeaponRecord(killer.accountId, DamageCauserName[damageCauserName]);
+        let weapon = DamageCauserName[damageCauserName];
+
+        // If a player bled out, give kill credit
+        // to the weapon that downed them originally
+        if(damageTypeCategory === "Damage_Groggy") {
+            const attack = this.attacks[attackId];
+            weapon       = attack ? Items[attack.weapon.itemId] : weapon
+        }
+
+        let record = this.getPlayerWeaponRecord(killer.accountId, weapon);
 
         this.players[killer.accountId].kills = (this.players[killer.accountId].kills || 0) + 1;
         record.kills = record.kills + 1;
