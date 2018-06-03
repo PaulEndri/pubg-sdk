@@ -91,9 +91,9 @@ export default class Player extends ApiModel {
     async internalLoadSeason(season, region) {
         const {data} = await this.api.get(`players/${this.id}/seasons/${season}`, region);
 
-        this.relationships[season] = data.attributes.gameModeStats;
+        this.relationships[season] = data;
 
-        return data.attributes.gameModeStats;
+        return data;
     }
 
     /**
@@ -113,5 +113,69 @@ export default class Player extends ApiModel {
         }
 
         throw new Error("No results found");
+    }
+
+    /**
+     * Batch find players by names
+     * 
+     * @param {String[]} names 
+     * @param {String} region 
+     * @return {Promise}
+     * @fulfil {Array}
+     */
+    static async findByNames(names, region) {
+        return await this.findMultiple('playerNames', names, region);
+    }
+
+    /**
+     * Batch find players by ids
+     * 
+     * @param {String[]} ids 
+     * @param {String} region 
+     * @return {Promise}
+     * @fulfil {Array}
+     */
+    static async findByIds(ids, region) {
+        return await this.findMultiple('playerIds', ids, region);
+    }
+
+    /**
+     * @private
+     * @param {String} field 
+     * @param {Array} variables 
+     * @param {String} region 
+     * @return {Promise}
+     */
+    static findMultiple(field, variables = [], region) {
+        const baseRoute  = `players?filter[${field}]=`;
+        let plural       = false;
+        let activeSearch = [];
+
+        if(variables.length > 6) {
+            plural = true;
+            let i  = 0;
+
+            while (i < variables.length) {
+                activeSearch.push(variables.slice(i, i += len));
+            }
+        } else {
+            activeSearch = variables;
+        }
+
+        if(plural) {
+            const promises = activeSearch.map(group => {
+                return Api
+                    .get(baseRoute + group.join(','), region)
+                    .then(({data}) => data)
+            })
+
+            return Promise
+                .all(promises)
+                .then((results) => results.reduce((total, current) => total.concat(current), []))
+        }
+
+        return Api
+            .get(baseRoute + group.join(','), region)
+            .then(({data}) => data)
     }
 }

@@ -1,23 +1,15 @@
 import axios from 'axios';
-import {List, Map} from 'immutable';
 import { isNullOrUndefined } from 'util';
-import Items from '../data/items';
-import DamageCauserName from '../data/damageCauserName';
-
-const typeMap = {
-    LogPlayerCreate:     'parseLogin',
-    LogPlayerAttack:     'parseAttack',
-    LogPlayerKill:       'parseKill',
-    LogPlayerTakeDamage: 'parseDamage'
-}
 
 /**
  * @class Telemetry
  */
 export default class Telemetry {
-    constructor({players, rosters}) {
+    constructor({players, rosters, attacks, positions}) {
         this.players = players;
         this.rosters = rosters;
+        this.attacks = attacks;
+        this.positions = positions;
     }
 
     getLeaderboard() {

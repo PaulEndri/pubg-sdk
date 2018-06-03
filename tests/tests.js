@@ -3,6 +3,7 @@ const SDK = require('../lib')
 const telemetry = require('./telemetry.json')
 const shroud = 'account.d50fdc18fcad49c691d38466bed6f8fd'
 let matchId = ''
+
 describe('Player', () => {
     it('Pull Shroud\'s profile via constructor', async () => {
         const Shroud = await new SDK.Player(shroud, 'pc-na')
@@ -39,10 +40,9 @@ describe('Season', () => {
     })
 })
 
-
 describe('Telemetry', () => {
     it('Parses', async () => {
-        const parser = new SDK.TelemetryParser(telemetry)
+        const parser = new SDK.TelemetryParser(telemetry, {positions: true, interval: 5})
 
         const data = await parser.parse()
 

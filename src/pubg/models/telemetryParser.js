@@ -8,17 +8,27 @@ const typeMap = {
     LogPlayerCreate:     'parseLogin',
     LogPlayerAttack:     'parseAttack',
     LogPlayerKill:       'parseKill',
-    LogPlayerTakeDamage: 'parseDamage'
+    LogPlayerTakeDamage: 'parseDamage',
+    LogPlayerPosition:   'parsePosition'
 }
 
+const CQC_RANGE    = 25;
+const SHORT_RANGE  = 100;
+const MEDIUM_RANGE = 300;
 /**
  * @class TelemetryParser
  */
 export default class TelemetryParser {
-    constructor(data) {
-        this.players = {};
-        this.rosters = {};
-        this.attacks = {};
+    constructor(data, options = {}) {
+        this.players   = {};
+        this.rosters   = {};
+        this.attacks   = {};
+        this.positions = {};
+
+        if(options.positions === true) {
+            this.parsePositions = true
+            this.interval = options.interval || 3
+        }
 
         if(typeof data === 'string') {
             axios
@@ -84,6 +94,12 @@ export default class TelemetryParser {
 
         this.players[character.accountId]         = character
         this.players[character.accountId].weapons = {}
+        this.players[character.accountId].ranges  = {
+            cqc:    0,
+            short:  0,
+            medium: 0,
+            long:   0
+        };
     }
 
     parseAttack({attacker, attackId, attackType, weapon, vehicle}) {
@@ -98,7 +114,7 @@ export default class TelemetryParser {
     }
 
     parseDamage({victim, attacker, attackId, damageReason, damageTypeCategory, damage, damageCauserName}) {
-        if(attackId === -1 || isNullOrUndefined(attacker)) {
+        if(attackId === -1 || !attacker.accountId || isNullOrUndefined(attacker)) {
             return;
         }
 
@@ -128,14 +144,46 @@ export default class TelemetryParser {
         // to the weapon that downed them originally
         if(damageTypeCategory === "Damage_Groggy") {
             const attack = this.attacks[attackId];
-            weapon       = attack ? Items[attack.weapon.itemId] : weapon
+            weapon       = attack ? Items[attack.weapon.itemId] : weapon;
         }
 
-        let record = this.getPlayerWeaponRecord(killer.accountId, weapon);
+        const record       = this.getPlayerWeaponRecord(killer.accountId, weapon);
+        const attacker     = this.players[killer.accountId];
+        const realDistance = distance/100;
+        attacker.kills     = (attacker.kills || 0) + 1;
+        record.kills       = record.kills + 1;
 
-        this.players[killer.accountId].kills = (this.players[killer.accountId].kills || 0) + 1;
-        record.kills = record.kills + 1;
-        record.distance = Math.max(distance, record.distance)
+        record.distance = Math.max(realDistance, record.distance);
+        
+        if (realDistance <= CQC_RANGE) {
+            attacker.ranges.cqc = attacker.ranges.cqc + 1;
+        } else if(realDistance <= SHORT_RANGE) {
+            attacker.ranges.short = attacker.ranges.short + 1;
+        } else if(realDistance <= MEDIUM_RANGE) {
+            attacker.ranges.medium = attacker.ranges.medium + 1;
+        } else {
+            attacker.ranges.long = attacker.ranges.long + 1;
+        }        
+    }
+
+    parsePosition({character, elapsedTime}) {
+        if(this.parsePositions !== true || elapsedTime < 1) {
+            return;
+        }
+        
+        const playerId = character.accountId;
+
+        if(!this.positions[playerId]) {
+            this.positions[playerId] = {
+                lastSeen: elapsedTime,
+                accountId: playerId,
+                name:      character.name,
+                positions: [character.location]
+            };
+        } else if(elapsedTime >= this.positions[playerId].lastSeen + this.interval) {
+            this.positions[playerId].positions.push(character.location);
+            this.positions[playerId].lastSeen = elapsedTime;
+        }
     }
 
     async parse() {
@@ -145,6 +193,11 @@ export default class TelemetryParser {
             }
         });
 
-        return new Telemetry({players: this.players, rosters: this.rosters})
+        return new Telemetry({
+            players: this.players,
+            rosters: this.rosters,
+            attacks: this.attacks,
+            positions: this.positions
+        })
     }
 }
